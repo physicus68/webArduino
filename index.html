@@ -1,0 +1,117 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="centrer">
+      <div id="conteneur">
+        <div id="palette-commandes">
+          <p class="legende">Connection à la platine Arduino</p>
+          <ul>
+            <li>
+              <button id="connection">Connection</button>
+            </li>
+          </ul>
+
+          <p class="legende">Paramètres de l'acquisition de données</p>
+          <form
+            oninput="duree_calc.value=(0.001 * parseInt(DT.value) * (parseInt(N.value)-1)).toPrecision(6)"
+          >
+            <ul>
+              <li>
+                <p>Entrée active</p>
+                <p>
+                  <label for="A0"> &ensp;A0 </label>
+                  <input type="checkbox" checked id="A0" />
+
+                  <label for="A1"> &ensp;A1 </label>
+                  <input type="checkbox" id="A1" />
+
+                  <label for="A2"> &ensp;A2 </label>
+                  <input type="checkbox" id="A2" />
+                </p>
+
+                <p>
+                  <label for="A3"> &ensp;A3 </label>
+                  <input type="checkbox" id="A3" />
+
+                  <label for="A4"> &ensp;A4 </label>
+                  <input type="checkbox" id="A4" />
+
+                  <label for="A5"> &ensp;A5 </label>
+                  <input type="checkbox" id="A5" />
+                </p>
+              </li>
+
+              <li>
+                <p>
+                  Nombre de points de mesures
+                  <input
+                    type="number"
+                    id="N"
+                    name="nbPoint"
+                    min="1"
+                    value="11"
+                    max="10000"
+                  />
+                </p>
+              </li>
+
+              <li>
+                <p>
+                  Durée entre deux mesures
+                  <input
+                    type="number"
+                    id="DT"
+                    name="delatT"
+                    min="1"
+                    value="100"
+                    max="1000"
+                  />
+                  ms.
+                </p>
+              </li>
+              <li>
+                <p>
+                  Durée de l'acquisition
+                  <output name="duree_calc" for="N DT ">1.00000</output>
+                  s.
+                </p>
+              </li>
+
+              <li>
+                <p>
+                  <button type="button" id="envoi">Démarrer</button>
+                  <button type="button" id="stop">Arrêter</button>
+                </p>
+              </li>
+            </ul>
+          </form>
+          <p class="legende">Téléchargement du script</p>
+          <ul>
+            <li>
+              <a href="webSerialAquisition.ino">téléchargement</a> du script pour une Arduino Uno.
+            </li>
+          </ul>
+        </div>
+
+        <div id="affichage-datas">
+          <p class="legende">Graphique</p>
+          <canvas id="canvas-graphe" width="600" height="400"></canvas>
+        </div>
+
+        <div id="table-datas">
+          <p class="legende">Données</p>
+          <button type="button" id="copier-presse-papier">Copier</button>
+          <div id="data-vue-conteneur">
+            <pre id="data-vue"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,48 @@
+body{
+    font-family: sans-serif;
+}
+
+
+ul{
+    list-style-type:none;
+}
+
+.legende {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-weight: bold;  
+  margin-top: 2em;
+}
+
+.centrer{
+    display: block;
+    margin: auto;
+    width: fit-content
+}
+
+#conteneur {
+  display: grid;  
+  grid-template-columns: auto auto auto;  
+  grid-column-gap: 1em;
+
+}
+
+/*
+#affichage-datas canvas {
+  border: black solid 2px;
+}
+*/
+
+
+#data-vue {
+  background-color: gainsboro;
+}
+
+
+#data-vue-conteneur {
+  overflow-y: auto;
+  width: 30ch;
+  height: 370px;
+ /* border: 2px solid black;*/
+  margin-top: 1ch;
+}
+
