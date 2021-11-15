@@ -49,7 +49,7 @@ async function envoiPortSerie() {
     (document.getElementById("A4").checked ? "1" : "0") +
     (document.getElementById("A5").checked ? "1" : "0"); // voies de mesures analogiques
 
-  let trame = "START;" + T + ";" + N + ";" + A + ";*";  
+  let trame = "START;" + T + ";" + N + ";" + A + ";*";
   await writer.write(trame); // commande envoyée
 }
 // Commande STOP
@@ -84,7 +84,9 @@ async function connectionPortSerie() {
             if (value[c] === "\n") {
               ligne = ligne + "";
             } else if (value[c] === "\r") {
-              addDonnes(ligne);
+              if (ligne.length > 0) {
+                addDonnes(ligne);
+              }
               ligne = "";
             } else {
               ligne = ligne + value[c];
@@ -134,7 +136,8 @@ function addDonnes(ligne) {
 /// On appelle ici les différentes vues à rafraichir
 function updateVues() {
   ajoutLigneTable(donnees[donnees.length - 1]);
-  tracerGraphique(donnees);
+  //tracerGraphique(donnees);
+  tracerPoint(donnees[donnees.length - 1]);
 }
 /// On appelle ici les différentes vues à initialiser (raz)
 function clearVues() {
@@ -148,7 +151,13 @@ function clearVues() {
 
 // Tableau de valeurs  ***********************************************************************/
 function clearTable() {
-  vue.innerHTML = "";
+  vue.innerHTML = "t";
+  for(let i = 0 ; i < 6 ; i++){
+    if( document.getElementById("A"+i).checked ){
+      vue.innerHTML = vue.innerHTML +";A"+i;
+    }
+  }
+  vue.innerHTML = vue.innerHTML +"\n";
 }
 async function ajoutLigneTable(ligne) {
   valeurs = ligne;
@@ -177,27 +186,30 @@ function copierDonneesTable() {
 // graphique ***********************************************************************/
 liste_couleurs = [
   "rgb(255, 0, 0)",
-  "rgb(0, 255, 0)",
-  "rgb(0, 0, 255)",
-  "rgb(0, 255, 255)",
-  "rgb(255, 0, 255)",
-  "rgb(255, 255, 0)",
+  "rgb(0, 128, 0)",
+  "rgb(65,105,225)",
+  "rgb(148,0,211)",
+  "rgb(210,105,30)",
+  "rgb(112,128,144)",
 ];
 width = canvas.width;
 height = canvas.height;
 X0 = 20;
 Y0 = 30;
 XMax = width - 20;
-YMax = 10;
+YMax = 25;
 x_max = 10; // en secondes
 y_max = 1024;
 ech_x = 1.0;
 ech_y = 1.0;
+let prev_valeur =[];
 
 function clearGraphique() {
   ctx.fillStyle = "rgb(255, 255, 255)";
   ctx.fillRect(0, 0, width, height);
   tracerAxes();
+  tracerLegende();
+  prev_valeur =[]
 }
 
 function tracerAxes() {
@@ -206,7 +218,7 @@ function tracerAxes() {
     Number(document.getElementById("DT").value) *
     (Number(document.getElementById("N").value) - 1);
   ctx.strokeStyle = "rgb(50, 50, 50)";
-  ctx.lineWidth = 1;
+  ctx.lineWidth = 0;
   ctx.beginPath();
   ctx.moveTo(getX(0), getY(0));
   ctx.lineTo(getX(x_extrem), getY(0));
@@ -215,13 +227,27 @@ function tracerAxes() {
   ctx.lineTo(getX(0), getY(0));
   ctx.stroke();
 
-  ctx.font = "20px Arial";
+  ctx.font = "15px Arial";
   ctx.fillStyle = "rgb(50, 50, 50)";
   ctx.textAlign = "center";
   ctx.fillText("0.0", getX(0), getY(0) + 20);
   ctx.fillText(x_max, getX(x_max), getY(0) + 20);
   ctx.fillText("t (en s)", getX(x_max * 0.5), getY(0) + 20);
+  ctx.fillText("1024", getX(0), getY(1024)-8 );
 }
+
+function tracerLegende(){
+  code_coul = 0;
+  for(let i = 0 ; i < 6 ; i++){
+    if( document.getElementById("A"+i).checked ){
+      ctx.font = "15px Arial";
+      ctx.fillStyle = liste_couleurs[code_coul];
+      ctx.fillText("A"+i, 565, YMax+ (code_coul +1 ) * 16);
+      code_coul++;
+    }
+  }
+}
+
 
 function getX(x) {
   x_max =
@@ -237,26 +263,21 @@ function getY(y) {
   return height - Y0 - y * ech_y;
 }
 
-function tracerGraphique(donnees) {
-  if (donnees.length > 0) {
-    N = donnees[0].length - 1;    
-    for (let i = 0; i < N; i++) {
-      t = [];
-      y = [];
-      donnees.forEach(function (ligne) {
-        X = getX(ligne[0]);
-        Y = getY(ligne[i+1]);
-        t.push(X);
-        y.push(Y);
-      });
-      ctx.strokeStyle = liste_couleurs[i];
-      ctx.beginPath();
-      ctx.moveTo(t[0], y[0]);
-      k = t.length;
-      for (let j = 1; j < k; j++) {
-        ctx.lineTo(t[j], y[j]);
+
+function tracerPoint(valeur) {
+  if (valeur) {
+    N = valeur.length;
+    if (prev_valeur) {
+      for (let i = 1; i < N; i++) {
+        ctx.beginPath();
+        ctx.strokeStyle = liste_couleurs[i-1];
+        ctx.moveTo(getX(prev_valeur[0]), getY(prev_valeur[i]));
+        ctx.lineTo(getX(valeur[0]), getY(valeur[i]));
+        ctx.stroke();
       }
-      ctx.stroke();
     }
+    prev_valeur = valeur;
   }
 }
+
+// idéalement utiliser  window.requestAnimationFrame(draw);
